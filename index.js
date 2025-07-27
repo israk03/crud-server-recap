@@ -26,9 +26,22 @@ async function run() {
   try {
     await client.connect();
 
+    const database = client.db("crud_recap");
+    const usersCollection = database.collection("users");
+
+    // GET <---------------------
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find();
+      const users = await cursor.toArray();
+      res.send(users);
+    });
+
+    // POST <---------------------
     app.post("/users", async (req, res) => {
       const user = req.body;
       console.log("New user found: ", user);
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
